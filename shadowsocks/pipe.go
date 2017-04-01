@@ -17,8 +17,8 @@ func SetReadTimeout(c net.Conn) {
 // PipeThenClose copies data from src to dst, closes dst when done.
 func PipeThenClose(src, dst net.Conn) {
 	defer dst.Close()
-	buf := leakyBuf.Get()
-	defer leakyBuf.Put(buf)
+	buf := pipeBuf.Get()
+	defer pipeBuf.Put(buf)
 	for {
 		SetReadTimeout(src)
 		n, err := src.Read(buf)
