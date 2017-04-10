@@ -17,20 +17,21 @@ func SetReadTimeout(c net.Conn) {
 // PipeThenClose copies data from src to dst, closes dst when done.
 func PipeThenClose(src, dst net.Conn) {
 	defer dst.Close()
-	buf := pipeBuf.Get()
-	defer pipeBuf.Put(buf)
 	for {
 		SetReadTimeout(src)
+		buf := pipeBuf.Get()
 		n, err := src.Read(buf)
 		// read may return EOF with n > 0
 		// should always process n > 0 bytes before handling error
 		if n > 0 {
 			// Note: avoid overwrite err returned by Read.
 			if _, err := dst.Write(buf[0:n]); err != nil {
+				pipeBuf.Put(buf)
 				Debug.Println("write:", err)
 				break
 			}
 		}
+		pipeBuf.Put(buf)
 		if err != nil {
 			// Always "use of closed network connection", but no easy way to
 			// identify this specific error. So just leave the error along for now.
