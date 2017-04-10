@@ -9,6 +9,8 @@ import (
 	"io"
 	"log"
 	"net"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"runtime"
@@ -17,7 +19,7 @@ import (
 	"sync"
 	"syscall"
 
-	ss "github.com/shadowsocks/shadowsocks-go/shadowsocks"
+	ss "github.com/menghan/shadowsocks-go/shadowsocks"
 )
 
 const (
@@ -451,5 +453,8 @@ func main() {
 		}
 	}
 
+	go func() {
+		log.Println(http.ListenAndServe("0.0.0.0:6060", nil))
+	}()
 	waitSignal()
 }
