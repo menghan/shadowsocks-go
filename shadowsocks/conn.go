@@ -25,13 +25,13 @@ func NewConn(c net.Conn, cipher *Cipher) *Conn {
 	return &Conn{
 		Conn:     c,
 		Cipher:   cipher,
-		readBuf:  leakyBuf.Get(),
-		writeBuf: leakyBuf.Get()}
+		readBuf:  pipeBuf.Get(),
+		writeBuf: pipeBuf.Get()}
 }
 
 func (c *Conn) Close() error {
-	leakyBuf.Put(c.readBuf)
-	leakyBuf.Put(c.writeBuf)
+	pipeBuf.Put(c.readBuf)
+	pipeBuf.Put(c.writeBuf)
 	return c.Conn.Close()
 }
 
